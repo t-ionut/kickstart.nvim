@@ -20,5 +20,3 @@ vim.filetype.add {
     ['docker%-compose%..*%.ya?ml'] = 'yaml.docker-compose',
   },
 }
-
-vim.treesitter.language.register('yaml', { 'yaml.docker-compose', 'yaml.helm-values' })

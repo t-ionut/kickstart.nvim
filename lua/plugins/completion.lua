@@ -3,7 +3,7 @@
 return {
   { -- Autocompletion. See `:help blink-cmp`
     'saghen/blink.cmp',
-    event = 'VimEnter',
+    event = { 'InsertEnter', 'CmdlineEnter' },
     version = '1.*',
     dependencies = {
       {

@@ -8,8 +8,10 @@ return {
     branch = 'main',
     config = function()
       local ts = require 'nvim-treesitter'
+      vim.treesitter.language.register('yaml', { 'yaml.docker-compose', 'yaml.helm-values' })
+
       -- Other parsers are installed automatically the first time a filetype is opened
-      ts.install {
+      local parsers = {
         'bash',
         'diff',
         'dockerfile',
@@ -38,6 +40,9 @@ return {
         'vimdoc',
         'yaml',
       }
+      local installed = ts.get_installed 'parsers'
+      local missing = vim.tbl_filter(function(p) return not vim.tbl_contains(installed, p) end, parsers)
+      if #missing > 0 then ts.install(missing) end
 
       ---@param buf integer
       ---@param language string
@@ -55,7 +60,7 @@ return {
           local buf, language = args.buf, vim.treesitter.language.get_lang(args.match)
           if not language then return end
 
-          if vim.tbl_contains(ts.get_installed 'parsers', language) then
+          if vim.tbl_contains(installed, language) or vim.tbl_contains(ts.get_installed 'parsers', language) then
             try_attach(buf, language)
           elseif vim.tbl_contains(available, language) then
             -- Auto-install missing parsers, then attach

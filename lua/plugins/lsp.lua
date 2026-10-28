@@ -49,10 +49,6 @@ return {
     'neovim/nvim-lspconfig',
     event = { 'BufReadPre', 'BufNewFile' },
     dependencies = {
-      { 'mason-org/mason.nvim', cmd = 'Mason', opts = {} },
-      'mason-org/mason-lspconfig.nvim', -- maps lspconfig names (e.g. `vtsls`) to Mason package names
-      'WhoIsSethDaniel/mason-tool-installer.nvim',
-      { 'j-hui/fidget.nvim', opts = {} }, -- LSP progress
       'b0o/SchemaStore.nvim', -- JSON/YAML schemas, used in after/lsp/{jsonls,yamlls}.lua
     },
     config = function()
@@ -94,12 +90,32 @@ return {
         end,
       })
 
-      require('mason-lspconfig').setup { automatic_enable = false }
-      require('mason-tool-installer').setup { ensure_installed = vim.list_extend(vim.deepcopy(servers), tools) }
-
       vim.lsp.enable(servers)
     end,
   },
+
+  -- Mason installs the servers/tools above. Its bin/ is already on PATH (see lua/config/options.lua),
+  -- so Mason itself only loads after startup, or on `:Mason`.
+  { 'mason-org/mason.nvim', cmd = 'Mason', opts = { PATH = 'skip' } },
+  {
+    'WhoIsSethDaniel/mason-tool-installer.nvim',
+    event = 'VeryLazy',
+    dependencies = {
+      'mason-org/mason.nvim',
+      'mason-org/mason-lspconfig.nvim', -- maps lspconfig names (e.g. `vtsls`) to Mason package names
+    },
+    config = function()
+      require('mason-lspconfig').setup { automatic_enable = false }
+      -- Check for missing tools at most once a day. Run `:MasonToolsInstall` to force it.
+      require('mason-tool-installer').setup {
+        ensure_installed = vim.list_extend(vim.deepcopy(servers), tools),
+        start_delay = 3000,
+        debounce_hours = 24,
+      }
+    end,
+  },
+
+  { 'j-hui/fidget.nvim', event = 'LspAttach', opts = {} }, -- LSP progress
 
   { -- Configures lua_ls for editing this config (Neovim runtime + plugin types), lazily
     'folke/lazydev.nvim',

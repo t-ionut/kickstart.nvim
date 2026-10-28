@@ -13,7 +13,6 @@ return {
       { 'igorlfs/nvim-dap-view', version = '1.*', opts = { winbar = { controls = { enabled = true } }, auto_toggle = true } },
       { 'theHamsta/nvim-dap-virtual-text', opts = {} },
       'mfussenegger/nvim-dap-python',
-      'mason-org/mason.nvim', -- puts the Mason-installed adapters on PATH
     },
     keys = {
       { '<F5>', function() require('dap').continue() end, desc = 'Debug: Start/Continue' },

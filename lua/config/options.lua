@@ -31,6 +31,16 @@ o.cursorline = true
 o.scrolloff = 10
 o.confirm = true -- ask to save instead of failing on :q with unsaved changes
 
+-- Disable remote-plugin providers. Nothing here uses them, and probing for python3 through
+-- pyenv shims costs ~3s every time a Python file is opened. See `:help provider`
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+
+-- Mason-installed servers/tools, available without loading mason.nvim at startup
+vim.env.PATH = vim.fn.stdpath 'data' .. '/mason/bin:' .. vim.env.PATH
+
 vim.diagnostic.config {
   update_in_insert = false,
   severity_sort = true,
