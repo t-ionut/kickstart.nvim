@@ -56,6 +56,8 @@ stylua .
 
 ## Key Keymaps
 
+`cheatsheet.md` (opened with `<leader>?`) is the full, user-facing keymap reference — update it whenever a keymap is added, changed or removed.
+
 | Key | Action |
 |-----|--------|
 | `<Space>` | Leader |
@@ -73,6 +75,7 @@ stylua .
 | `gs` / `gS` | Flash jump / treesitter select (mini.surround keeps `sa`/`sd`/`sr`) |
 | `[b` / `]b` | Previous/next buffer (built-in) |
 | `<leader>jq` | Format JSON with jq |
+| `<leader>?` | Open the cheat sheet |
 
 ## External Requirements
 

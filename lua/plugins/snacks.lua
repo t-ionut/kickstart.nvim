@@ -77,6 +77,21 @@ return {
       { '<leader>cR', function() Snacks.rename.rename_file() end, desc = '[R]ename file (updates imports)' },
       { '<c-/>', function() Snacks.terminal() end, desc = 'Toggle terminal', mode = { 'n', 't' } },
       { '<leader>un', function() Snacks.notifier.hide() end, desc = 'Dismiss notifications' },
+      {
+        '<leader>?',
+        function()
+          Snacks.win {
+            file = vim.fn.stdpath 'config' .. '/cheatsheet.md',
+            width = 0.7,
+            height = 0.85,
+            border = 'rounded',
+            title = ' Cheat sheet ',
+            bo = { modifiable = false },
+            wo = { spell = false, wrap = false, conceallevel = 2, signcolumn = 'no', statuscolumn = ' ' },
+          }
+        end,
+        desc = 'Open keymap cheat sheet',
+      },
     },
     init = function()
       -- LSP pickers, set per buffer when a server attaches
