@@ -8,7 +8,36 @@ return {
     branch = 'main',
     config = function()
       local ts = require 'nvim-treesitter'
-      ts.install { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+      -- Other parsers are installed automatically the first time a filetype is opened
+      ts.install {
+        'bash',
+        'diff',
+        'dockerfile',
+        'git_config',
+        'gitcommit',
+        'gitignore',
+        'hcl',
+        'helm',
+        'html',
+        'htmldjango',
+        'javascript',
+        'json',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'python',
+        'query',
+        'regex',
+        'sql',
+        'terraform',
+        'toml',
+        'tsx',
+        'typescript',
+        'vim',
+        'vimdoc',
+        'yaml',
+      }
 
       ---@param buf integer
       ---@param language string

@@ -1,13 +1,53 @@
+-- Language servers. Per-server settings live in after/lsp/<name>.lua, which Neovim merges on top
+-- of the defaults shipped by nvim-lspconfig. See `:help lsp-config`.
+
+-- Servers to enable (lspconfig names). Mason installs them automatically.
+local servers = {
+  -- Python / Django
+  'basedpyright',
+  'ruff',
+  -- TypeScript / React
+  'vtsls',
+  'eslint',
+  'tailwindcss', -- only attaches in projects with a Tailwind config
+  -- Data & infra
+  'jsonls',
+  'yamlls',
+  'taplo',
+  'dockerls',
+  'docker_compose_language_service',
+  'helm_ls',
+  'terraformls',
+  'bashls',
+  'nginx_language_server',
+  -- Lua
+  'lua_ls',
+}
+
+-- Formatters, linters and debug adapters for Mason to install (Mason package names)
+local tools = {
+  'stylua',
+  'prettierd',
+  'shfmt',
+  'shellcheck',
+  'djlint',
+  'hadolint',
+  'tflint',
+  'actionlint',
+}
+
 ---@module 'lazy'
 ---@type LazySpec
 return {
   {
     'neovim/nvim-lspconfig',
+    event = { 'BufReadPre', 'BufNewFile' },
     dependencies = {
-      { 'mason-org/mason.nvim', opts = {} },
-      'mason-org/mason-lspconfig.nvim', -- maps lspconfig names (e.g. `ts_ls`) to Mason package names
+      { 'mason-org/mason.nvim', cmd = 'Mason', opts = {} },
+      'mason-org/mason-lspconfig.nvim', -- maps lspconfig names (e.g. `vtsls`) to Mason package names
       'WhoIsSethDaniel/mason-tool-installer.nvim',
       { 'j-hui/fidget.nvim', opts = {} }, -- LSP progress
+      'b0o/SchemaStore.nvim', -- JSON/YAML schemas, used in after/lsp/{jsonls,yamlls}.lua
     },
     config = function()
       vim.api.nvim_create_autocmd('LspAttach', {
@@ -41,38 +81,31 @@ return {
         end,
       })
 
-      -- Servers to enable. Per-server settings go in this table. See `:help lsp-config`
-      ---@type table<string, vim.lsp.Config>
-      local servers = {
-        pyright = {},
-        ts_ls = {},
-        lua_ls = {
-          on_init = function(client)
-            if client.workspace_folders then
-              local path = client.workspace_folders[1].name
-              if path ~= vim.fn.stdpath 'config' and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc')) then return end
-            end
-            client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
-              runtime = { version = 'LuaJIT', path = { 'lua/?.lua', 'lua/?/init.lua' } },
-              workspace = {
-                checkThirdParty = false,
-                library = vim.tbl_extend('force', vim.api.nvim_get_runtime_file('', true), { '${3rd}/luv/library', '${3rd}/busted/library' }),
-              },
-            })
-          end,
-          settings = { Lua = {} },
-        },
-      }
-
       require('mason-lspconfig').setup { automatic_enable = false }
-      local ensure_installed = vim.tbl_keys(servers)
-      vim.list_extend(ensure_installed, { 'stylua', 'ruff', 'prettierd' })
-      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+      require('mason-tool-installer').setup { ensure_installed = vim.list_extend(vim.deepcopy(servers), tools) }
 
-      for name, server in pairs(servers) do
-        vim.lsp.config(name, server)
-        vim.lsp.enable(name)
-      end
+      vim.lsp.enable(servers)
     end,
+  },
+
+  { -- Configures lua_ls for editing this config (Neovim runtime + plugin types), lazily
+    'folke/lazydev.nvim',
+    ft = 'lua',
+    ---@module 'lazydev'
+    ---@type lazydev.Config
+    ---@diagnostic disable-next-line: missing-fields
+    opts = {
+      library = {
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+      },
+    },
+  },
+
+  { -- Pick the Python virtualenv (pyenv, uv, poetry, .venv) the LSP and debugger should use
+    'linux-cultist/venv-selector.nvim',
+    ft = 'python',
+    cmd = 'VenvSelect',
+    keys = { { '<leader>cv', '<cmd>VenvSelect<CR>', desc = 'Select Python [V]env' } },
+    opts = {},
   },
 }

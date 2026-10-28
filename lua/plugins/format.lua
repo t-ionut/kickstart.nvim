@@ -23,6 +23,7 @@ return {
       formatters_by_ft = {
         lua = { 'stylua' },
         python = { 'ruff_organize_imports', 'ruff_format' },
+        htmldjango = { 'djlint' },
         javascript = prettier,
         javascriptreact = prettier,
         typescript = prettier,
@@ -31,6 +32,10 @@ return {
         yaml = prettier,
         css = prettier,
         markdown = prettier,
+        html = prettier,
+        sh = { 'shfmt' },
+        terraform = { 'terraform_fmt' },
+        hcl = { 'terraform_fmt' },
         xml = { 'xmllint' },
       },
     },
