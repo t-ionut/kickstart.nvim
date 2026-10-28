@@ -61,4 +61,29 @@ return {
       end,
     },
   },
+
+  { -- Side-by-side diffs, merge conflict resolution (3-way) and file/branch history
+    'sindrets/diffview.nvim',
+    cmd = { 'DiffviewOpen', 'DiffviewClose', 'DiffviewFileHistory' },
+    keys = {
+      {
+        '<leader>gd',
+        function()
+          if require('diffview.lib').get_current_view() then
+            vim.cmd.DiffviewClose()
+          else
+            vim.cmd.DiffviewOpen()
+          end
+        end,
+        desc = 'Toggle git [d]iff view (changes / merge conflicts)',
+      },
+      { '<leader>gD', '<cmd>DiffviewOpen origin/HEAD...HEAD --imply-local<CR>', desc = 'Git [D]iff branch vs default (PR review)' },
+      { '<leader>gh', '<cmd>DiffviewFileHistory %<CR>', desc = 'Git file [h]istory' },
+      { '<leader>gH', '<cmd>DiffviewFileHistory<CR>', desc = 'Git branch [H]istory' },
+    },
+    opts = {
+      enhanced_diff_hl = true,
+      view = { merge_tool = { layout = 'diff3_mixed' } },
+    },
+  },
 }

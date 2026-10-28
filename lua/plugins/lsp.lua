@@ -34,7 +34,13 @@ local tools = {
   'hadolint',
   'tflint',
   'actionlint',
+  'debugpy',
+  'js-debug-adapter',
 }
+
+-- GitHub Copilot via its official language server + Neovim's native inline completion (0.12+).
+-- Opt in with `vim.g.enable_copilot = true` in init.lua, then run `:LspCopilotSignIn` once.
+if vim.g.enable_copilot then table.insert(servers, 'copilot') end
 
 ---@module 'lazy'
 ---@type LazySpec
@@ -73,6 +79,13 @@ return {
                 vim.api.nvim_clear_autocmds { group = 'user-lsp-highlight', buffer = event2.buf }
               end,
             })
+          end
+
+          if client and client.name == 'copilot' then
+            vim.lsp.inline_completion.enable(true, { bufnr = event.buf })
+            vim.keymap.set('i', '<C-l>', function()
+              if not vim.lsp.inline_completion.get() then return '<C-l>' end
+            end, { buffer = event.buf, expr = true, desc = 'Accept Copilot suggestion' })
           end
 
           if client and client:supports_method('textDocument/inlayHint', event.buf) then
